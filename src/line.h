@@ -27,9 +27,7 @@ inline bool lineintersect(Point a, Segment s, Polygon p){
         p.reverse_orientation();                                       //make sure polygon orientation is counterclockwise,
     }
 
-    Point mid(((s[0][0]+s[1][0])/2),((s[0][1]+s[1][1])/2));     //mid is the middle of the line
     Segment first(a,s[0]);
-    Segment second(a,mid);                                         //the three segments needed to check for visibility
     Segment third(a,s[1]);
     bool flag=0;
     for(int i=0; i<p.size(); i++){
@@ -43,16 +41,11 @@ inline bool lineintersect(Point a, Segment s, Polygon p){
                     return true;
                 }
             }
-            if((s[0]!=p[i]&&s[1]!=p[j])&&(s[1]!=p[i]&&s[0]!=p[j])){
-                if(CGAL::do_intersect(second, polline)){
-                    return true;
-                }
+        if(s[1]!=p[i]&&s[1]!=p[j]){
+            if(CGAL::do_intersect(third, polline)){
+                return true;
             }
-            if(s[1]!=p[i]&&s[1]!=p[j]){
-                if(CGAL::do_intersect(third, polline)){
-                    return true;
-                }
-            }
+        }
     }
     return false;
 }

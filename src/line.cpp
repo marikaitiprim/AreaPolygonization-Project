@@ -8,6 +8,7 @@
 SegmentVector alledges(Point a, Polygon pol, SegmentVector Seg){
     
     SegmentVector b;
+    bool f=0,l=0;
 
     for(int i=0;i<Seg.size();i++){                                                      //take every visible line from convex hull
         int start=0;
@@ -18,9 +19,16 @@ SegmentVector alledges(Point a, Polygon pol, SegmentVector Seg){
         for(int i=0;i<pol.size();i++){                                                 //get all the lines inside that
             if(pol[i]==stpoint){
                 start=i;
+                f=1;
             }
-            if(pol[i]==enpoint){
+            else if(pol[i]==enpoint){
                 end=i;
+                l=1;
+            }
+            if(f==1&&l==1){
+                f=0;
+                l=0;
+                break;
             }
         }
 

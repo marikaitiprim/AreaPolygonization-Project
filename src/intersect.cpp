@@ -27,9 +27,7 @@ SegmentVector intersect(Point* a, Polygon* p){
         if(i+1!=temp.size()){
             j=i+1;
         }
-        Point mid(((temp[i][0]+temp[j][0])/2),((temp[i][1]+temp[j][1])/2));     //mid is the middle of the line
-        Segment first(*a,temp[i]);
-        Segment second(*a,mid);                                         //the three segments needed to check for visibility
+        Segment first(*a,temp[i]);                                         //the three segments needed to check for visibility
         Segment third(*a,temp[j]);
         bool flag=0;
         for(int k=0; k<temp.size();k++){                                //see whether lines intersect with any segment from the convex hull
@@ -43,12 +41,6 @@ SegmentVector intersect(Point* a, Polygon* p){
                 if(intersect_check(first, polline)){
                 flag=1;
                 break;
-                }
-            }
-            if(temp[i]!=temp[k]&&temp[j]!=temp[l]){
-                if(intersect_check(second, polline)){
-                    flag=1;
-                    break;
                 }
             }
             if(temp[j]!=temp[k]&&temp[j]!=temp[l]){
