@@ -23,14 +23,24 @@ Vector neighbours(Vector V, Polygon pol){
     Point a;
     if(pol[0]==V[0]){           //1st point of polgon is also 1st point of the path
         neigh.push_back(pol[pol.size()-1]);
+        if(pol[pol.size()-1]==V[V.size()-1]){   //last point in the polygon is also the last in the path
+            neigh.push_back(pol[0]);
+            return neigh;
+        }
     }
 
     a = pol[0];
     for(int i=1; i<pol.size(); i++){        //for each vertex in the polygon
         if(pol[i]==V[0]){                       //if the point of the vertex is equal to the first point of the path
             neigh.push_back(a);         //first neighbour
+            break;
         }
         a = pol[i];
+    }
+
+    if(pol[pol.size()-1]==V[V.size()-1]){   //last point in the polygon is also the last in the path
+        neigh.push_back(pol[0]);
+        return neigh;
     }
 
     bool flag = 0;
@@ -43,13 +53,9 @@ Vector neighbours(Vector V, Polygon pol){
             flag = 1;
         }
     }
-    if(pol[pol.size()-1]==V[V.size()-1]){   //last point in the polygon is also the last in the path
-        neigh.push_back(pol[0]);
-    }
     return neigh;
 
 }
-
 
 /*
 *This function takes in the polygon, a double representing the threshold, the list of edges and the list of paths
