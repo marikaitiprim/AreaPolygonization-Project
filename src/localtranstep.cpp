@@ -9,16 +9,12 @@ bool commonpoint_check(Segment a, Segment b){
 }
 
 /*check if new polygon is valid*/
-bool checkValidity(Polygon pol,Segment pr, Segment qs){
+bool checkValidity(Polygon pol,Segment pr, Segment qs, kTree* kdtree){
     //a) new edges do not intersect each other
     if(intersect_check(pr,qs)){
         return 0;
     }
     //b) new edges do not intersect another edge in the polygon
-    Tree kdtree;
-    for(int i=0; i<pol.size(); i++){            //initialize kdtree + insert all points of the polygon
-        kdtree.insert(pol[i]);
-    }
 
     Xy X,Y;
     Vector pqrs;                            //store p,q,r,s into a vector
@@ -45,7 +41,7 @@ bool checkValidity(Polygon pol,Segment pr, Segment qs){
     Fuzzybox fb(min,max);	                                //fuzzy box
     Vector innerpoints;
 
-    kdtree.search(std::back_inserter(innerpoints), fb);     //range-search query
+    kdtree->search(std::back_inserter(innerpoints), fb);     //range-search query
 
     Vector inpoint, inneigh;
     for(int i=0; i<innerpoints.size(); i++){                //for every inner point
@@ -95,7 +91,7 @@ bool checkValidity(Polygon pol,Segment pr, Segment qs){
 }
 
 /*local step in simulated annealing*/
-Polygon localtransitionstep(Polygon pol){
+Polygon localtransitionstep(Polygon pol,kTree* kdtree){
     Polygon newpol;
     int qi = rand() % pol.size();       //select random point q in the polygon
     Point q = pol[qi];
@@ -115,7 +111,7 @@ Polygon localtransitionstep(Polygon pol){
     Segment qs = Segment(q,s);
     Segment rs = Segment(r,s);
 
-    if(checkValidity(pol,pr,qs)){
+    if(checkValidity(pol,pr,qs,kdtree)){
         newpol = changePolygon(pol,qv,rs); 
     }
     else{

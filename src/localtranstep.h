@@ -18,13 +18,13 @@
 typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
 typedef K::Segment_2 Segment;
 typedef CGAL::Search_traits_2<K>                      Traits;
-typedef CGAL::Kd_tree<Traits>                         Tree;
+typedef CGAL::Kd_tree<Traits>                         kTree;
 typedef K::Point_2                                     Point;
 typedef std::vector<Point>                            Vector;
 typedef CGAL::Polygon_2<K>                           Polygon;
 typedef CGAL::Fuzzy_iso_box<Traits>                 Fuzzybox;
 typedef std::vector<int>    Xy;
 
-Polygon localtransitionstep(Polygon);
+Polygon localtransitionstep(Polygon,kTree*);
 
 #endif

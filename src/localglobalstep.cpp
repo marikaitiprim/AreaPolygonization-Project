@@ -28,6 +28,8 @@ bool metropolis(double T, double DE){
 Polygon localglobalstep(Polygon pol,int an,int L,bool maxmin,bool subdivision,Point qlast, Point qfirst){
     double polenergy = energy(pol,maxmin);
     double T = 1.0;
+    bool tree = 1;
+    kTree kdtree;
     srand(time(NULL));
     int counter=0;        //count iterations
     while(T>=0){
@@ -35,7 +37,14 @@ Polygon localglobalstep(Polygon pol,int an,int L,bool maxmin,bool subdivision,Po
         Polygon newpol;
         if(an==1){                                              //perform transition step
             //local step
-            newpol = localtransitionstep(pol);
+            if(tree){           //polygon has changed
+                kdtree.clear();
+                for(int i=0; i<pol.size(); i++){            //initialize kdtree + insert all points of the polygon
+                    kdtree.insert(pol[i]);
+                }
+                tree = 0;
+            }
+            newpol = localtransitionstep(pol,&kdtree);
         }
         else if(an==2){ //global step
             newpol = globaltransitionstep(pol,subdivision,qlast,qfirst);
@@ -45,6 +54,7 @@ Polygon localglobalstep(Polygon pol,int an,int L,bool maxmin,bool subdivision,Po
         double DE = newpolenergy-polenergy;
         if(metropolis(T,DE)){             //metropolis
             pol = newpol;                           //apply transition
+            tree = 1;                       //polygon changed
             T = T - (1/L);
         }
 
