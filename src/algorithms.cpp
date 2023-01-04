@@ -39,9 +39,17 @@ Polygon incremental(Vector* points,int edgeselect,bool x, bool sm){    //points 
         
         SegmentVector sv = intersect(&p,&polyg);        //find visble edges      
         SegmentVector segv = alledges(p,polyg,sv);
-
-        Segment e = edgeselection(&segv,&p,edgeselect); //select the appropriate edge
-
+        Segment e;
+        if(segv.size()==0){     //if a point has no visible edges return an empty polygon
+            Polygon fail;
+            return fail;
+        }
+        else if(segv.size()==1){     //if a point has no visible edges return an empty polygon
+            e=segv[0];
+        }
+        else{
+            e = edgeselection(&segv,&p,edgeselect); //select the appropriate edge
+        }
         Polygon* pointpol = &polyg;
         Polygon polyg = insertpoint(pointpol,&p,&e);        //insert to polygon
 
@@ -74,12 +82,18 @@ Polygon incrementalsub(Vector* points,int edgeselect,bool x, bool sm, bool start
             if(se!=segv.end()){
                 segv.erase(std::find(segv.begin(),segv.end(),protect[1]));
             }
-        }  
+        }
+        Segment e;  
         if(segv.size()==0){     //if a point has no visible edges return an empty polygon
             Polygon fail;
             return fail;
         }
-        Segment e = edgeselection(&segv,&p,edgeselect); //select the appropriate edge
+        else if(segv.size()==1){     //if a point has no visible edges return an empty polygon
+            e=segv[0];
+        }
+        else{
+            e = edgeselection(&segv,&p,edgeselect); //select the appropriate edge
+        }
         Polygon* pointpol = &polyg;
         Polygon polyg = insertpoint(pointpol,&p,&e);        //insert to polygon
 
@@ -117,12 +131,17 @@ Polygon convex_hull(Vector* points,int edgeselect){    //points -> from main (in
                 pairs.push_back(pa);
             } 
         }
+        PSpair e;
         if((pairs.size()==0)&&(temp.size()!=0)){
             std::cout<<temp.size()<<" remain(s) that have no visible edge."<<std::endl;
             return pol;
         }
-
-        PSpair e = edgeselection2(&pairs,edgeselect);   //select edge according to the option
+        else if(pairs.size()==1){
+            e=pairs[0];
+        }
+        else{
+            e = edgeselection2(&pairs,edgeselect);   //select edge according to the option
+        }
 
         Polygon* pointpol = &pol;
         Polygon pol = insertpoint(pointpol,&(e.first),&(e.second));      //insert point into polygon
@@ -215,6 +234,7 @@ Polygon convex_hullsub(Vector* points,int edgeselect, bool start, SegmentVector 
                 pairs.push_back(pa);
             }
         }
+        PSpair e;
         if ((pairs.size() == 0) && (temp.size() != 0)){
 
             std::cout << temp.size() << " remain(s) that have no visible edge." << std::endl;
@@ -228,8 +248,12 @@ Polygon convex_hullsub(Vector* points,int edgeselect, bool start, SegmentVector 
             }
 
         }
-
-        PSpair e = edgeselection2(&pairs, edgeselect); // select edge according to the option
+        else if(pairs.size()==1){
+            e=pairs[0];
+        }
+        else{
+            e = edgeselection2(&pairs,edgeselect);   //select edge according to the option
+        }
 
         Polygon *pointpol = &pol;
         Polygon pol = insertpoint(pointpol, &(e.first), &(e.second)); // insert point into polygon
