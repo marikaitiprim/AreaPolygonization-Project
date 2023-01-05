@@ -24,7 +24,7 @@ typedef K::Point_2 Point;
 typedef vector<Point> Vector;
 
 int main(int argc, char *argv[]){
-
+    srand(time(0));
     clock_t t;
 
     //errors in arguments

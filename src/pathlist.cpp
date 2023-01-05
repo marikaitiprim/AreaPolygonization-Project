@@ -5,7 +5,7 @@
 
 #include "pathlist.h"
 
-/*This function combinew two Pathlists into one.
+/*This function combines two Pathlists into one.
 *Pathlist a will enter first, while b will be second.
 */
 Pathlist combine(Pathlist a, Pathlist b){
@@ -50,7 +50,9 @@ Pathlist createpaths(int pointnum, Polygon pol){
            
             Path.push_back(pol[p]);
         }
-        temp.push_back(Path);
+        if(rand()%15==0){
+            temp.push_back(Path);
+        }
     }
     if(pointnum>2){
         Pathlist rest=createpaths(pointnum-1,pol);
