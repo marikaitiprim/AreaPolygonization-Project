@@ -54,9 +54,15 @@ Pathlist createpaths(int pointnum, Polygon pol){
            
             Path.push_back(pol[p]);
         }
-        if(rand()%(pol.size()/x)==0){
+        if(pol.size()>600){
+            if(rand()%(pol.size()/x)==0){
+            temp.push_back(Path);
+            }
+        }
+        else{
             temp.push_back(Path);
         }
+        
     }
     if(pointnum>2){
         Pathlist rest=createpaths(pointnum-1,pol);
