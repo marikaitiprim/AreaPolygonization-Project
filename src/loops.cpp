@@ -9,6 +9,10 @@
 */
 SegmentVector edgeslist(Polygon pol){
     SegmentVector temp;
+    int x=100;
+    if(pol.size()>5000){
+        x=1000;
+    }
     if(pol.size()<=600){
         for(int i=0;i<pol.size()-1;i++){
         temp.push_back(Segment(pol[i],pol[i+1]));
@@ -17,11 +21,11 @@ SegmentVector edgeslist(Polygon pol){
     }
     else{
         for(int i=0;i<pol.size()-1;i++){
-            if(rand()%15==0){
+            if(rand()%(pol.size()/x)==0){
                 temp.push_back(Segment(pol[i],pol[i+1]));
             }
         }
-        if(rand()%(pol.size()/100)==0){
+        if(rand()%(pol.size()/x)==0){
             temp.push_back(Segment(pol[pol.size()-1],pol[0]));
         }
     }

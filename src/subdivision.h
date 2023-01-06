@@ -21,5 +21,6 @@ typedef std::vector<Polygon>                          Polygons;
 
 Subsets splitsubsets(Vector, int );
 Polygon subdivision(Vector,int , bool, int,int, bool );
+Polygon subdivisionPol(Polygon,int, bool, int,int, bool);
 
 #endif

@@ -33,6 +33,10 @@ Pathlist combine(Pathlist a, Pathlist b){
 */
 Pathlist createpaths(int pointnum, Polygon pol){
     Pathlist temp;
+    int x=100;
+    if(pol.size()>5000){
+        x=1000;
+    }
     if(pointnum<2){
         return temp;
     }
@@ -50,7 +54,7 @@ Pathlist createpaths(int pointnum, Polygon pol){
            
             Path.push_back(pol[p]);
         }
-        if(rand()%15==0){
+        if(rand()%(pol.size()/x)==0){
             temp.push_back(Path);
         }
     }
