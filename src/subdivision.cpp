@@ -52,6 +52,42 @@ Subsets splitsubsets(Vector points, int m){
 
 }
 
+
+Polygon locglobsub(Subsets subs, Polygons pols, int L, bool maxmin){
+    Polygons globalpols;
+
+    Vector subset = subs[0];                    //first polygon
+    Polygon newpol = localglobalstep(pols[0],2,L,maxmin,1,subset[subset.size()-1],Point(-1,-1));
+    globalpols.push_back(newpol);
+
+    for(int i=1; i<pols.size()-1; i++){         //inner polygons
+        subset = subs[i];
+        newpol = localglobalstep(pols[i],2,L,maxmin,1,subset[subset.size()-1],subset[0]);
+        globalpols.push_back(newpol);
+    }
+
+    subset = subs[subs.size()-1];                    //last polygon
+    newpol = localglobalstep(pols[pols.size()-1],2,L,maxmin,1,Point(-1,-1),subset[0]);
+    globalpols.push_back(newpol);
+
+    Polygon merged;
+    if(pols.size()>1){          //more than 2 polygons
+        merged = mergePolygon(pols[0],pols[1]);
+        if(pols.size()>3){      //more than 3 polygons
+            for(int i=2; i<pols.size(); i++){
+                merged = mergePolygon(merged,pols[i]);
+            }
+        }
+    }
+    else{                       //one polygon only
+        merged = pols[0];
+    }
+
+    Polygon finalpol = localglobalstep(merged,1,L,maxmin,0,Point(-1,-1),Point(-1,-1));
+
+    return finalpol;
+}
+
 /*subdivision case for simulated annealing. bool incremental = 1 if greedy algorithm incremental
 has been selected, 0 if convex hull*/
 Polygon subdivision(Vector points,int m, bool inc, int edgeselect,int L, bool maxmin){
@@ -147,36 +183,23 @@ Polygon subdivision(Vector points,int m, bool inc, int edgeselect,int L, bool ma
         }
     }
 
-    Polygons globalpols;
+    Polygon finalpol = locglobsub(subs, pols, L, maxmin);
 
-    Vector subset = subs[0];                    //first polygon
-    Polygon newpol = localglobalstep(pols[0],2,L,maxmin,1,subset[subset.size()-1],Point(-1,-1));
-    globalpols.push_back(newpol);
 
-    for(int i=1; i<pols.size()-1; i++){         //inner polygons
-        subset = subs[i];
-        newpol = localglobalstep(pols[i],2,L,maxmin,1,subset[subset.size()-1],subset[0]);
-        globalpols.push_back(newpol);
+    return finalpol;
+
+}
+
+
+/*subdivision case for simulated annealing. bool incremental = 1 if greedy algorithm incremental
+has been selected, 0 if convex hull*/
+Polygon subdivisionPol(Polygon poly,int m, bool inc, int edgeselect,int L, bool maxmin){
+    Vector points;
+    for(int i=0;i<poly.size();i++){
+        points.push_back(poly[i]);
     }
 
-    subset = subs[subs.size()-1];                    //last polygon
-    newpol = localglobalstep(pols[pols.size()-1],2,L,maxmin,1,Point(-1,-1),subset[0]);
-    globalpols.push_back(newpol);
-
-    Polygon merged;
-    if(pols.size()>1){          //more than 2 polygons
-        merged = mergePolygon(pols[0],pols[1]);
-        if(pols.size()>3){      //more than 3 polygons
-            for(int i=2; i<pols.size(); i++){
-                merged = mergePolygon(merged,pols[i]);
-            }
-        }
-    }
-    else{                       //one polygon only
-        merged = pols[0];
-    }
-
-    Polygon finalpol = localglobalstep(merged,1,L,maxmin,0,Point(-1,-1),Point(-1,-1));
+    Polygon finalpol = subdivision(points,m,inc,edgeselect,L,maxmin);
 
     return finalpol;
 
