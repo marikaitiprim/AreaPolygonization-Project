@@ -10,6 +10,8 @@
 #include "localglobalstep.h"
 #include "subdivision.h"
 #include <dirent.h>
+#include <thread>
+#include <future>
 
 using namespace std;
 
@@ -19,6 +21,29 @@ typedef vector<Point> Vector;
 typedef vector<int> Size;
 typedef vector<double> Score;
 typedef vector<Score> Storescore;
+
+static int timeout = 0;
+static void alarm_handler(int sig){
+    //kill thread
+    timeout = 1;
+    cout << "bye" << endl;
+    exit(-1);
+}
+
+Polygon algorithm1(Vector points){
+    struct sigaction sact;
+    sigemptyset( &sact.sa_mask );
+    sact.sa_flags = 0;
+    sact.sa_handler = alarm_handler;
+    sigaction( SIGALRM, &sact, NULL );
+
+    int cutoff = points.size();
+    alarm(cutoff);
+    Polygon pol = incremental(&points,3,1,1);
+    cout << "area before " << pol.area() << endl;
+    Polygon newpol = loops(pol,1.5,10,1);
+    return newpol;
+}
 
 int main(int argc, char *argv[]){
 
@@ -49,7 +74,7 @@ int main(int argc, char *argv[]){
             if(!strcmp(inputfile,".") || !strcmp(inputfile,"..")){
                 continue;
             }
-            //printf ("%s\n", inputfile);
+            printf ("%s\n", inputfile);
 
             char path[100];
             stpcpy(path,inputfolder);
@@ -100,8 +125,6 @@ int main(int argc, char *argv[]){
             free(line);
             fclose(fp);                         //close file
 
-            cutoff = 500*points.size();         //cut-off 
-
             int position = -1;
             for(int i=0; i<pointsize.size(); i++){
                 if(pointsize[i]==points.size()){            //check if we have already evaluate a file with the same point size
@@ -115,18 +138,22 @@ int main(int argc, char *argv[]){
                 position = pointsize.size()-1;
             }
 
-            //begin clock to see how much time it takes for the algorithm to run
+
+            //algorithm1
             t = clock();
-            //algorithm 1
+            auto future = async(algorithm1,points);
+            future.wait();
             t = clock() - t;    //stop the clock
-            //cout << "construction time: " << (int)((float)t*1000/CLOCKS_PER_SEC) << " milliseconds" << endl;
-            t = clock();
-            //algorithm 2
-            t = clock() - t;    //stop the clock
-            t = clock();
-            //algorithm 3
-            t = clock() - t;    //stop the clock
-            //.... 
+
+            if(timeout){           //run out of time
+                cout << "out of time!" << endl;
+            }
+            else{               //receive data
+                Polygon pol = future.get();
+                cout << "area " << pol.area() << endl; 
+                cout << "construction time: " << (int)((float)t*1000/CLOCKS_PER_SEC) << " milliseconds" << endl;
+            }
+
         }   
 
         ofstream outfile;
