@@ -17,6 +17,6 @@ typedef CGAL::Polygon_2<K>                           Polygon;
 typedef K::Segment_2                                Segment;
 
 
-Polygon globaltransitionstep(Polygon,bool,Point,Point);
+Polygon globaltransitionstep(Polygon,bool,Point,Point,int);
 
 #endif

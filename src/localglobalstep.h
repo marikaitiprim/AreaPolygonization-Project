@@ -16,6 +16,6 @@ typedef std::vector<Point>                            Vector;
 typedef CGAL::Polygon_2<K>                           Polygon; 
 
 
-Polygon localglobalstep(Polygon,int,int,bool,bool,Point,Point);
+Polygon localglobalstep(Polygon,int,int,bool,bool,Point,Point,int);
 
 #endif

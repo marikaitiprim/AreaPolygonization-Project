@@ -25,7 +25,10 @@ bool metropolis(double T, double DE){
     }
 }
 
-Polygon localglobalstep(Polygon pol,int an,int L,bool maxmin,bool subdivision,Point qlast, Point qfirst){
+Polygon localglobalstep(Polygon pol,int an,int L,bool maxmin,bool subdivision,Point qlast, Point qfirst, int tim){
+    int tms = (int)((float)clock()*1000/CLOCKS_PER_SEC) + tim;        //starting  milliseconds
+    int tml;
+
     double polenergy = energy(pol,maxmin);
     double T = 1.0;
     bool tree = 1;
@@ -35,6 +38,7 @@ Polygon localglobalstep(Polygon pol,int an,int L,bool maxmin,bool subdivision,Po
     while(T>=0){
         counter++;
         Polygon newpol;
+
         if(an==1){                                              //perform transition step
             //local step
             if(tree){           //polygon has changed
@@ -44,10 +48,21 @@ Polygon localglobalstep(Polygon pol,int an,int L,bool maxmin,bool subdivision,Po
                 }
                 tree = 0;
             }
-            newpol = localtransitionstep(pol,&kdtree);
+
+            tml = (int)((float)clock()*1000/CLOCKS_PER_SEC) - tms;      //milliseconds until now
+            newpol = localtransitionstep(pol,&kdtree,tml);
+            if(newpol.area()==0){       //out of time
+                Polygon fail;
+                return fail;
+            }
         }
         else if(an==2){ //global step
-            newpol = globaltransitionstep(pol,subdivision,qlast,qfirst);
+            tml = (int)((float)clock()*1000/CLOCKS_PER_SEC) - tms;      //milliseconds until now
+            newpol = globaltransitionstep(pol,subdivision,qlast,qfirst,tml);
+            if(newpol.area()==0){           //out of time
+                Polygon fail;
+                return fail;
+            }
         }
         
         double newpolenergy = energy(newpol,maxmin);

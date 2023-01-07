@@ -8,8 +8,16 @@ bool commonpoint_checkg(Segment a, Segment b){
     return 0;
 }
 
-bool checkValidity(Polygon pol, Segment pr, Segment sq, Segment st, Segment qt)
-{
+int checkValidity(Polygon pol, Segment pr, Segment sq, Segment st, Segment qt, int tim){
+    int cutoff = 500*pol.size();
+    int tms = (int)((float)clock()*1000/CLOCKS_PER_SEC) + tim;        //starting  milliseconds
+    int tml;
+
+    tml = (int)((float)clock()*1000/CLOCKS_PER_SEC) - tms;      //milliseconds until now
+    if(tml>= cutoff){       //check cutoff
+        return -1;
+    }
+
     // a) pr does not intersect with sq and qt
     if (intersect_check(pr, sq))
     {
@@ -29,8 +37,12 @@ bool checkValidity(Polygon pol, Segment pr, Segment sq, Segment st, Segment qt)
     // b) each of the new does not intersect any other
     Vector pv, neigh;
 
-    for (int i = 0; i < pol.size(); i++)
-    {
+    for (int i = 0; i < pol.size(); i++){
+        tml = (int)((float)clock()*1000/CLOCKS_PER_SEC) - tms;      //milliseconds until now
+        if(tml>= cutoff){       //check cutoff
+            return -1;
+        }
+
         if (pol[i] == pr.vertex(0))
         { // if pol[i] == p
             continue;
@@ -52,6 +64,10 @@ bool checkValidity(Polygon pol, Segment pr, Segment sq, Segment st, Segment qt)
         Point successor = neigh[1]; // find successor of current point
 
         Segment current = Segment(pol[i], successor);
+        tml = (int)((float)clock()*1000/CLOCKS_PER_SEC) - tms;      //milliseconds until now
+        if(tml>= cutoff){       //check cutoff
+            return -1;
+        }
 
         if (intersect_check(pr, current))
         { // pr with current
@@ -85,7 +101,11 @@ bool checkValidity(Polygon pol, Segment pr, Segment sq, Segment st, Segment qt)
 }
 
 /*implementation of global transition step*/
-Polygon globaltransitionstep(Polygon pol,bool subdivision,Point qlast, Point qfirst){
+Polygon globaltransitionstep(Polygon pol,bool subdivision,Point qlast, Point qfirst, int tim){
+    int cutoff = 500*pol.size();
+    int tms = (int)((float)clock()*1000/CLOCKS_PER_SEC) + tim;        //starting  milliseconds
+    int tml;
+
     Polygon newpol;
     int qi = rand() % pol.size();       //select random point q in the polygon
     Point q = pol[qi];
@@ -108,6 +128,12 @@ Polygon globaltransitionstep(Polygon pol,bool subdivision,Point qlast, Point qfi
                 qneigh = neighbours(qv,pol);        //find neighbours of q
                 p = qneigh[0];                //p is predecessor of q
                 r = qneigh[1];                //r is successor of q  
+
+                tml = (int)((float)clock()*1000/CLOCKS_PER_SEC) - tms;      //milliseconds until now
+                if(tml>= cutoff){       //check cutoff
+                    Polygon fail;
+                    return fail;
+                }
             }
         }
         if(qfirst!=Point(-1,-1)){       //not first subset
@@ -121,6 +147,12 @@ Polygon globaltransitionstep(Polygon pol,bool subdivision,Point qlast, Point qfi
                 qneigh = neighbours(qv,pol);        //find neighbours of q
                 p = qneigh[0];                //p is predecessor of q
                 r = qneigh[1];                //r is successor of q  
+
+                tml = (int)((float)clock()*1000/CLOCKS_PER_SEC) - tms;      //milliseconds until now
+                if(tml>= cutoff){       //check cutoff
+                    Polygon fail;
+                    return fail;
+                }
             }
         }
     }           
@@ -130,6 +162,12 @@ Polygon globaltransitionstep(Polygon pol,bool subdivision,Point qlast, Point qfi
     while(s==q || s==p || s==r){        //s must not be the same as q,p,r
         si = rand() % pol.size();       //select again
         s = pol[si];
+
+        tml = (int)((float)clock()*1000/CLOCKS_PER_SEC) - tms;      //milliseconds until now
+        if(tml>= cutoff){       //check cutoff
+            Polygon fail;
+            return fail;
+        }
     }
 
     Vector sv;
@@ -153,6 +191,13 @@ Polygon globaltransitionstep(Polygon pol,bool subdivision,Point qlast, Point qfi
                 if(counter>3*pol.size()){           //upper bound - cannot find any point to change
                     return pol;
                 }
+
+                tml = (int)((float)clock()*1000/CLOCKS_PER_SEC) - tms;      //milliseconds until now
+                if(tml>= cutoff){       //check cutoff
+                    Polygon fail;
+                    return fail;
+                }
+                
             } 
         }
         if(qfirst!=Point(-1,-1)){            //not first subset
@@ -167,6 +212,13 @@ Polygon globaltransitionstep(Polygon pol,bool subdivision,Point qlast, Point qfi
                 if(counter>3*pol.size()){
                     return pol;
                 }
+
+                tml = (int)((float)clock()*1000/CLOCKS_PER_SEC) - tms;      //milliseconds until now
+                if(tml>= cutoff){       //check cutoff
+                    Polygon fail;
+                    return fail;
+                }
+
             } 
             sv.push_back(s);                    //put s into a vector sv
             Vector sneigh = neighbours(sv,pol); //find neighbours of s
@@ -179,11 +231,22 @@ Polygon globaltransitionstep(Polygon pol,bool subdivision,Point qlast, Point qfi
     Segment sq = Segment(s,q);
     Segment qt = Segment(q,t);
     Segment pr = Segment(p,r);
-    if(checkValidity(pol,pr,sq,st,qt)){
+
+    tml = (int)((float)clock()*1000/CLOCKS_PER_SEC) - tms;      //milliseconds until now
+    int valuecheck = checkValidity(pol,pr,sq,st,qt,tml);
+    
+    if(valuecheck==1){
         newpol=changePolygon(pol,qv,st);
+        if(newpol.area()==0){       //error
+            newpol = pol;
+        }
     }
-    else{
+    else if(valuecheck==0){
         newpol = pol;
+    }
+    else if(valuecheck==-1){        //out of time
+        Polygon fail;
+        return fail;
     }
     return newpol;
 

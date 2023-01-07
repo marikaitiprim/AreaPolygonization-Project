@@ -4,6 +4,7 @@
 #include <iostream>
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Polygon_2.h>
+#include <ctime>
 #include "sort.h"
 #include "triangle.h"
 #include "intersect.h"

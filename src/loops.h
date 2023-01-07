@@ -6,6 +6,7 @@
 #include <CGAL/Polygon_2.h>
 #include <CGAL/convex_hull_2.h>
 #include <iostream>
+#include <ctime>
 #include "pathlist.h"
 #include "localchange.h"
 #include "changepol.h"
@@ -22,7 +23,7 @@ Vector neighbours(Vector , Polygon );
 Polygon removing(Segment , Vector );
 Polygon adding(Vector , Point , Point );
 SegmentVector edgeslist(Polygon);
-Polygon loops(Polygon, double, int,bool);
+Polygon loops(Polygon, double, int,bool,int);
 
 
 #endif

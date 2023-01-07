@@ -25,6 +25,6 @@ typedef CGAL::Polygon_2<K>                           Polygon;
 typedef CGAL::Fuzzy_iso_box<Traits>                 Fuzzybox;
 typedef std::vector<int>    Xy;
 
-Polygon localtransitionstep(Polygon,kTree*);
+Polygon localtransitionstep(Polygon,kTree*,int);
 
 #endif

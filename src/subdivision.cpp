@@ -57,17 +57,17 @@ Polygon locglobsub(Subsets subs, Polygons pols, int L, bool maxmin){
     Polygons globalpols;
 
     Vector subset = subs[0];                    //first polygon
-    Polygon newpol = localglobalstep(pols[0],2,L,maxmin,1,subset[subset.size()-1],Point(-1,-1));
+    Polygon newpol = localglobalstep(pols[0],2,L,maxmin,1,subset[subset.size()-1],Point(-1,-1),0);
     globalpols.push_back(newpol);
 
     for(int i=1; i<pols.size()-1; i++){         //inner polygons
         subset = subs[i];
-        newpol = localglobalstep(pols[i],2,L,maxmin,1,subset[subset.size()-1],subset[0]);
+        newpol = localglobalstep(pols[i],2,L,maxmin,1,subset[subset.size()-1],subset[0],0);
         globalpols.push_back(newpol);
     }
 
     subset = subs[subs.size()-1];                    //last polygon
-    newpol = localglobalstep(pols[pols.size()-1],2,L,maxmin,1,Point(-1,-1),subset[0]);
+    newpol = localglobalstep(pols[pols.size()-1],2,L,maxmin,1,Point(-1,-1),subset[0],0);
     globalpols.push_back(newpol);
 
     Polygon merged;
@@ -83,7 +83,7 @@ Polygon locglobsub(Subsets subs, Polygons pols, int L, bool maxmin){
         merged = pols[0];
     }
 
-    Polygon finalpol = localglobalstep(merged,1,L,maxmin,0,Point(-1,-1),Point(-1,-1));
+    Polygon finalpol = localglobalstep(merged,1,L,maxmin,0,Point(-1,-1),Point(-1,-1),0);
 
     return finalpol;
 }

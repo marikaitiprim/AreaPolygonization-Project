@@ -26,7 +26,10 @@ SegmentVector protectedpoints(Vector sorted){
 
 /*incremental algorithm*/
 Polygon incremental(Vector* points,int edgeselect,bool x, bool sm){    //points -> from main (inputs.cpp)
-
+    clock_t t;
+    int cutoff = 500*points->size();
+    int tms = (int)((float)clock()*1000/CLOCKS_PER_SEC);        //starting  milliseconds
+    int tml;
     //sorting points
     Vector sortedpoints = sortv(points,x,sm);
 
@@ -39,6 +42,13 @@ Polygon incremental(Vector* points,int edgeselect,bool x, bool sm){    //points 
         
         SegmentVector sv = intersect(&p,&polyg);        //find visble edges      
         SegmentVector segv = alledges(p,polyg,sv);
+
+        tml = (int)((float)clock()*1000/CLOCKS_PER_SEC) - tms;      //milliseconds until now
+        if(tml>= cutoff){       //check cutoff
+            Polygon fail;
+            return fail;
+        }
+
         Segment e;
         if(segv.size()==0){     //if a point has no visible edges return an empty polygon
             Polygon fail;
@@ -52,6 +62,12 @@ Polygon incremental(Vector* points,int edgeselect,bool x, bool sm){    //points 
         }
         Polygon* pointpol = &polyg;
         Polygon polyg = insertpoint(pointpol,&p,&e);        //insert to polygon
+
+        tml = (int)((float)clock()*1000/CLOCKS_PER_SEC) - tms;      //milliseconds until now
+        if(tml>= cutoff){       //check cutoff
+            Polygon fail;
+            return fail;
+        }
 
     }
     return polyg;

@@ -80,7 +80,12 @@ Vector neighbours(Vector V, Polygon pol){
 *and finds the best combinations of paths and edges to swift in order to create the polygon we need. Applying local_search
 *algorithm.
 */
-Polygon loops(Polygon polygon, double threshold,int L , bool maxmin){
+Polygon loops(Polygon polygon, double threshold,int L , bool maxmin, int time){
+    clock_t t;
+    int cutoff = 500*polygon.size();
+    int tms = (int)((float)clock()*1000/CLOCKS_PER_SEC) + time;        //starting  milliseconds
+    int tml;
+
     double DA=threshold+1.0;
     Segment e;
     Vector V;
@@ -97,12 +102,26 @@ Polygon loops(Polygon polygon, double threshold,int L , bool maxmin){
     bool flag = 0;
     while(DA>=threshold){
         SegmentVector edgelist=edgeslist(pol);
-        Pathlist Paths=createpaths(L, pol);     
+        Pathlist Paths=createpaths(L, pol);   
+
         for(int i=0; i<edgelist.size();i++){
+
+            tml = (int)((float)clock()*1000/CLOCKS_PER_SEC) - tms;      //milliseconds until now
+            if(tml>= cutoff){       //check cutoff
+                Polygon fail;
+                return fail;
+            }
+
             e=edgelist[i];
             for(int j=0;j<Paths.size();j++){
+
+                tml = (int)((float)clock()*1000/CLOCKS_PER_SEC) - tms;      //milliseconds until now
+                if(tml>= cutoff){       //check cutoff
+                    Polygon fail;
+                    return fail;
+                }
+
                 V=Paths[j];
-                
                 if ((std::find(V.begin(), V.end(), e[0]) != V.end())||(std::find(V.begin(), V.end(), e[1]) != V.end())) {
                     continue;
                 }
@@ -143,5 +162,6 @@ Polygon loops(Polygon polygon, double threshold,int L , bool maxmin){
             return pol;
         }
     }
+
     return pol; 
 }

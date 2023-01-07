@@ -9,7 +9,16 @@ bool commonpoint_check(Segment a, Segment b){
 }
 
 /*check if new polygon is valid*/
-bool checkValidity(Polygon pol,Segment pr, Segment qs, kTree* kdtree){
+int checkValidity(Polygon pol,Segment pr, Segment qs, kTree* kdtree,int tim){
+    int cutoff = 500*pol.size();
+    int tms = (int)((float)clock()*1000/CLOCKS_PER_SEC) + tim;        //starting  milliseconds
+    int tml;
+
+    tml = (int)((float)clock()*1000/CLOCKS_PER_SEC) - tms;      //milliseconds until now
+    if(tml>= cutoff){       //check cutoff
+        return -1;
+    }
+
     //a) new edges do not intersect each other
     if(intersect_check(pr,qs)){
         return 0;
@@ -43,6 +52,11 @@ bool checkValidity(Polygon pol,Segment pr, Segment qs, kTree* kdtree){
 
     kdtree->search(std::back_inserter(innerpoints), fb);     //range-search query
 
+    tml = (int)((float)clock()*1000/CLOCKS_PER_SEC) - tms;      //milliseconds until now
+    if(tml>= cutoff){       //check cutoff
+        return -1;
+    }
+
     Vector inpoint, inneigh;
     for(int i=0; i<innerpoints.size(); i++){                //for every inner point
         bool flag = 0;
@@ -56,6 +70,12 @@ bool checkValidity(Polygon pol,Segment pr, Segment qs, kTree* kdtree){
         if(flag){
             continue;
         }
+
+        tml = (int)((float)clock()*1000/CLOCKS_PER_SEC) - tms;      //milliseconds until now
+        if(tml>= cutoff){       //check cutoff
+            return -1;
+        }
+
         inpoint.push_back(temp);
         inneigh = neighbours(inpoint,pol);                  //find neighbours of inner point
         Point before = inneigh[0];                          //predecessor
@@ -86,12 +106,20 @@ bool checkValidity(Polygon pol,Segment pr, Segment qs, kTree* kdtree){
 
         inpoint.clear();
         inneigh.clear();
+
+        tml = (int)((float)clock()*1000/CLOCKS_PER_SEC) - tms;      //milliseconds until now
+        if(tml>= cutoff){       //check cutoff
+            return -1;
+        }
     }
     return 1;
 }
 
 /*local step in simulated annealing*/
-Polygon localtransitionstep(Polygon pol,kTree* kdtree){
+Polygon localtransitionstep(Polygon pol,kTree* kdtree,int tim){
+    int tms = (int)((float)clock()*1000/CLOCKS_PER_SEC) + tim;        //starting  milliseconds
+    int tml;
+
     Polygon newpol;
     int qi = rand() % pol.size();       //select random point q in the polygon
     Point q = pol[qi];
@@ -111,11 +139,18 @@ Polygon localtransitionstep(Polygon pol,kTree* kdtree){
     Segment qs = Segment(q,s);
     Segment rs = Segment(r,s);
 
-    if(checkValidity(pol,pr,qs,kdtree)){
+    tml = (int)((float)clock()*1000/CLOCKS_PER_SEC) - tms;      //milliseconds until now
+    int valuecheck = checkValidity(pol,pr,qs,kdtree,tml);
+
+    if(valuecheck==1){          //success in checking
         newpol = changePolygon(pol,qv,rs); 
     }
-    else{
+    else if(valuecheck==0){     //fail in checking
         newpol = pol;
+    }
+    else if(valuecheck==-1){    //out of time
+        Polygon fail;
+        return fail;
     }
 
     return newpol;
