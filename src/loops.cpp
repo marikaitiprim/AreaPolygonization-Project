@@ -85,7 +85,6 @@ Polygon loops(Polygon polygon, double threshold,int L , bool maxmin, int time){
     int cutoff = 500*polygon.size();
     int tms = (int)((float)clock()*1000/CLOCKS_PER_SEC) + time;        //starting  milliseconds
     int tml;
-    int tcut=tms;
 
     double DA=threshold+1.0;
     Segment e;
@@ -93,15 +92,19 @@ Polygon loops(Polygon polygon, double threshold,int L , bool maxmin, int time){
     edgepath ep;
     EdgePath T;
     double areas;
+    int x=0;
     if(maxmin){
         areas = 0.0;
     }else{
         areas = polygon.area();
     }
+    if(polygon.size()>100){
+        x=polygon.size();
+    }
     Polygon pol = polygon;
     int counter = 0;
     bool flag = 0;
-    while((DA>=threshold)&&(tcut<cutoff-10)){
+    while((DA>=threshold)&&(tml<cutoff-x)){
         SegmentVector edgelist=edgeslist(pol);
         Pathlist Paths=createpaths(L, pol);   
 
@@ -162,7 +165,6 @@ Polygon loops(Polygon polygon, double threshold,int L , bool maxmin, int time){
         if(flag){
             return pol;
         }
-        tcut=(int)((float)clock()*1000/CLOCKS_PER_SEC) - tms;
     }
 
     return pol; 
