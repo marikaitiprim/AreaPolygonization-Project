@@ -1,4 +1,4 @@
-// /home/angelos/CGAL-5.5.1/scripts//cgal_create_CMakeLists -s sort
+// /home/angelos/CGAL-5.5.1/scripts//cgal_create_CMakeLists -s evaluate
 // cmake -DCGAL_DIR=/home/angelos/CGAL-5.5.1 .
 // make
 
@@ -85,6 +85,7 @@ Polygon loops(Polygon polygon, double threshold,int L , bool maxmin, int time){
     int cutoff = 500*polygon.size();
     int tms = (int)((float)clock()*1000/CLOCKS_PER_SEC) + time;        //starting  milliseconds
     int tml;
+    int tcut=tms;
 
     double DA=threshold+1.0;
     Segment e;
@@ -100,7 +101,7 @@ Polygon loops(Polygon polygon, double threshold,int L , bool maxmin, int time){
     Polygon pol = polygon;
     int counter = 0;
     bool flag = 0;
-    while(DA>=threshold){
+    while((DA>=threshold)&&(tcut<cutoff-10)){
         SegmentVector edgelist=edgeslist(pol);
         Pathlist Paths=createpaths(L, pol);   
 
@@ -161,6 +162,7 @@ Polygon loops(Polygon polygon, double threshold,int L , bool maxmin, int time){
         if(flag){
             return pol;
         }
+        tcut=(int)((float)clock()*1000/CLOCKS_PER_SEC) - tms;
     }
 
     return pol; 

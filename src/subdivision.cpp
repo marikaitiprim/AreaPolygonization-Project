@@ -90,10 +90,14 @@ Polygon locglobsub(Subsets subs, Polygons pols, int L, bool maxmin){
 
 /*subdivision case for simulated annealing. bool incremental = 1 if greedy algorithm incremental
 has been selected, 0 if convex hull*/
-Polygon subdivision(Vector points,int m, bool inc, int edgeselect,int L, bool maxmin){
+Polygon subdivision(Vector points,int m, bool inc, int edgeselect,int L, bool maxmin, int time){
     Subsets subs = splitsubsets(points,m);
     Polygons pols;
     SegmentVector protect;
+    clock_t t;
+    int cutoff = 500*points.size();
+    int tms = (int)((float)clock()*1000/CLOCKS_PER_SEC) + time;        //starting  milliseconds
+    int tml;
     if(inc){                //incremental algorithm
         for(int i=0; i<subs.size(); i++){       //for every subset
             Polygon pol;
@@ -141,6 +145,12 @@ Polygon subdivision(Vector points,int m, bool inc, int edgeselect,int L, bool ma
             }
             pols.push_back(pol);
             protect.clear();
+
+            tml = (int)((float)clock()*1000/CLOCKS_PER_SEC) - tms;      //milliseconds until now
+            if(tml>= cutoff){       //check cutoff
+                Polygon fail;
+                return fail;
+            }
         }
     }
     else{                           //convex_hull algorithm
@@ -180,11 +190,22 @@ Polygon subdivision(Vector points,int m, bool inc, int edgeselect,int L, bool ma
             }
             pols.push_back(pol);
             protect.clear();
+
+            tml = (int)((float)clock()*1000/CLOCKS_PER_SEC) - tms;      //milliseconds until now
+            if(tml>= cutoff){       //check cutoff
+                Polygon fail;
+                return fail;
+            }
         }
     }
 
     Polygon finalpol = locglobsub(subs, pols, L, maxmin);
 
+    tml = (int)((float)clock()*1000/CLOCKS_PER_SEC) - tms;      //milliseconds until now
+            if(tml>= cutoff){       //check cutoff
+                Polygon fail;
+                return fail;
+    }
 
     return finalpol;
 
@@ -193,13 +214,13 @@ Polygon subdivision(Vector points,int m, bool inc, int edgeselect,int L, bool ma
 
 /*subdivision case for simulated annealing. bool incremental = 1 if greedy algorithm incremental
 has been selected, 0 if convex hull*/
-Polygon subdivisionPol(Polygon poly,int m, bool inc, int edgeselect,int L, bool maxmin){
+Polygon subdivisionPol(Polygon poly,int m, bool inc, int edgeselect,int L, bool maxmin, int time){
     Vector points;
     for(int i=0;i<poly.size();i++){
         points.push_back(poly[i]);
     }
 
-    Polygon finalpol = subdivision(points,m,inc,edgeselect,L,maxmin);
+    Polygon finalpol = subdivision(points,m,inc,edgeselect,L,maxmin,time);
 
     return finalpol;
 

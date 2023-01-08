@@ -22,6 +22,90 @@ typedef vector<Score> Storescore;
 
 static int timeout = 0;
 
+float algorithm1(Vector points, bool max){
+    std::cout << "starting algorithm1 for max:"<<max << std::endl;
+    clock_t t,t1,t2;
+    Polygon pol,newpol;
+    int tml;
+    float ret=0.0;
+    if(max){
+        ret=1.0;
+    }
+
+    t = clock();        //start clock for the whole algorithm      
+    pol = incremental(&points, 3, 1, 1);
+    t1 = clock() - t;                             //stop clock for incremental
+    tml = (int)((float)t1*1000/CLOCKS_PER_SEC);      
+    std::cout << "Incremental time: " << tml << std::endl;
+
+    if(pol.area()==0){
+        //failed
+        cout << "failed" << endl;
+        return ret;
+    }
+    cout << "area incremental " << pol.area() << endl;
+    newpol = loops(pol, 1.5, 10, max, tml);
+    t2 = clock() - t;                               //stop clock for local search
+    tml = (int)((float)t2*1000/CLOCKS_PER_SEC);      
+    std::cout << "Local search time: " << (int)((float)(t2-t1)*1000/CLOCKS_PER_SEC) << std::endl;
+    std::cout << "Total: " << tml << std::endl;
+
+    if(newpol.area()==0){
+        //failed
+        cout << "failed" << endl;
+        return ret;
+    }else{
+        cout << "area local search " << newpol.area() << endl;
+    }
+
+    t = clock() - t;    //stop the clock of the whole algorithm
+    cout << "construction time: " << (int)((float)t*1000/CLOCKS_PER_SEC) << " milliseconds" << endl;
+    return newpol.area();
+
+}
+
+float algorithm2(Vector points, bool max){
+    std::cout << "starting algorithm2 for max:"<<max << std::endl;
+    clock_t t,t1,t2;
+    Polygon pol,newpol;
+    int tml;
+    float ret=0.0;
+    if(max){
+        ret=1.0;
+    }
+
+    t = clock();        //start clock for the whole algorithm      
+    pol = incremental(&points, 3, 1, 1);
+    t1 = clock() - t;                             //stop clock for incremental
+    tml = (int)((float)t1*1000/CLOCKS_PER_SEC);      
+    std::cout << "Incremental time: " << tml << std::endl;
+
+    if(pol.area()==0){
+        //failed
+        cout << "failed" << endl;
+        return ret;
+    }
+    cout << "area incremental " << pol.area() << endl;
+    newpol = localglobalstep(pol,2,6000,max,0,Point(-1,-1),Point(-1,-1),tml);
+    t2 = clock() - t;                               //stop clock for local step
+    tml = (int)((float)t2*1000/CLOCKS_PER_SEC);      
+    std::cout << "global step time: " << (int)((float)(t2-t1)*1000/CLOCKS_PER_SEC) << std::endl;
+    std::cout << "Total: " << tml << std::endl;
+
+    if(newpol.area()==0){
+        //failed
+        cout << "failed" << endl;
+        return ret;
+    }else{
+        cout << "area global step " << newpol.area() << endl;
+    }
+
+    t = clock() - t;    //stop the clock of the whole algorithm
+    cout << "construction time: " << (int)((float)t*1000/CLOCKS_PER_SEC) << " milliseconds" << endl;
+    return newpol.area();
+
+}
+
 int main(int argc, char *argv[]){
 
     clock_t t,t1,t2;
@@ -119,67 +203,48 @@ int main(int argc, char *argv[]){
 
 
             bool max = 1; //maximization
+            Polygon cpol;
+            CGAL::convex_hull_2(points.begin(),points.end(),std::back_inserter(cpol));
 
             //algorithm1--> incremental + local search only for sets < 1000
-            t = clock();        //start clock for the whole algorithm      
-
-            pol = incremental(&points, 3, 1, 1);
-            t1 = clock() - t;                             //stop clock for incremental
-            tml = (int)((float)t1*1000/CLOCKS_PER_SEC);      
-            std::cout << "Incremental time: " << tml << std::endl;
-
-            if(pol.area()==0){
-                //failed
-                cout << "failed" << endl;
-            }else{
-                cout << "area incremental " << pol.area() << endl;
-                Polygon newpol = loops(pol, 1.5, 10, max, tml);
-                t2 = clock() - t;                               //stop clock for local search
-                tml = (int)((float)t2*1000/CLOCKS_PER_SEC);      
-                std::cout << "Local search time: " << (int)((float)(t2-t1)*1000/CLOCKS_PER_SEC) << std::endl;
-                std::cout << "Total: " << tml << std::endl;
-
-                if(newpol.area()==0){
-                    //failed
-                    cout << "failed" << endl;
-                }else{
-                    cout << "area local search " << newpol.area() << endl;
-                }
-            }
-
-            t = clock() - t;    //stop the clock of the whole algorithm
-            cout << "construction time: " << (int)((float)t*1000/CLOCKS_PER_SEC) << " milliseconds" << endl;
-
+           float res1=algorithm1(points,true);
+           if((res1!=1.0)&&(res1!=1.0)){
+            std::cout << "\tResutl of algorithm1 is: " << res1/cpol.area() << std::endl;
+           }
+           float res2=algorithm2(points,true);
+           if((res2!=1.0)&&(res2!=1.0)){
+            std::cout << "\tResutl of algorithm1 is: " << res2/cpol.area() << std::endl;
+           }
 
             //algorithm 2
-            t = clock();        //start clock for the whole algorithm      
+            // t = clock();        //start clock for the whole algorithm      
 
-            pol = incremental(&points, 3, 1, 1);
-            t1 = clock() - t;                             //stop clock for incremental
-            tml = (int)((float)t1*1000/CLOCKS_PER_SEC);      
-            std::cout << "Incremental time: " << tml << std::endl;
+            // pol = incremental(&points, 3, 1, 1);
+            // t1 = clock() - t;                             //stop clock for incremental
+            // tml = (int)((float)t1*1000/CLOCKS_PER_SEC);      
+            // std::cout << "Incremental time: " << tml << std::endl;
 
-            if(pol.area()==0){
-                //failed
-                cout << "failed" << endl;
-            }else{
-                cout << "area incremental " << pol.area() << endl;
-                Polygon newpol = localglobalstep(pol,2,6000,max,0,Point(-1,-1),Point(-1,-1),tml);
-                t2 = clock() - t;                               //stop clock for local step
-                tml = (int)((float)t2*1000/CLOCKS_PER_SEC);      
-                std::cout << "global step time: " << (int)((float)(t2-t1)*1000/CLOCKS_PER_SEC) << std::endl;
-                std::cout << "Total: " << tml << std::endl;
+            // if(pol.area()==0){
+            //     //failed
+            //     cout << "failed" << endl;
+            // }else{
+            //     cout << "area incremental " << pol.area() << endl;
+            //     Polygon newpol = localglobalstep(pol,2,6000,max,0,Point(-1,-1),Point(-1,-1),tml);
+            //     t2 = clock() - t;                               //stop clock for local step
+            //     tml = (int)((float)t2*1000/CLOCKS_PER_SEC);      
+            //     std::cout << "global step time: " << (int)((float)(t2-t1)*1000/CLOCKS_PER_SEC) << std::endl;
+            //     std::cout << "Total: " << tml << std::endl;
 
-                if(newpol.area()==0){
-                    //failed
-                    cout << "failed" << endl;
-                }else{
-                    cout << "area global step " << newpol.area() << endl;
-                }
-            }
+            //     if(newpol.area()==0){
+            //         //failed
+            //         cout << "failed" << endl;
+            //     }else{
+            //         cout << "area global step " << newpol.area() << endl;
+            //     }
+            // }
 
-            t = clock() - t;    //stop the clock of the whole algorithm
-            cout << "construction time: " << (int)((float)t*1000/CLOCKS_PER_SEC) << " milliseconds" << endl;
+            // t = clock() - t;    //stop the clock of the whole algorithm
+            // cout << "construction time: " << (int)((float)t*1000/CLOCKS_PER_SEC) << " milliseconds" << endl;
 
         }   
 
