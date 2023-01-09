@@ -1,5 +1,5 @@
 // /home/angelos/CGAL-5.5.1/scripts//cgal_create_CMakeLists -s evaluate
-// cmake -DCGAL_DIR=/home/angelos/CGAL-5.5.1 .
+// cmake -DCGAL_DIR=/home/angelos/CGAL-5.5.1 . -DCMAKE_BUILD_TYPE=Release
 // make
 
 #include "loops.h"
@@ -31,6 +31,7 @@ SegmentVector edgeslist(Polygon pol){
     }
     return temp;
 }
+
 
 
 

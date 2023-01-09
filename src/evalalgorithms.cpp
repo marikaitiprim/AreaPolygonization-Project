@@ -3,7 +3,7 @@
 using namespace std;
 
 //incremental + local search
-double algorithm1(Vector points, bool max){
+double algorithm1(Vector points, bool max, bool sm, bool x, double th, int L){
     std::cout << "starting algorithm1 for max:"<<max << std::endl;
     clock_t t,t1,t2;
     Polygon pol,newpol;
@@ -15,7 +15,7 @@ double algorithm1(Vector points, bool max){
     }
 
     t = clock();        //start clock for the whole algorithm      
-    pol = incremental(&points, edgeselect, 1, 1);
+    pol = incremental(&points, edgeselect, x, sm);
     t1 = clock() - t;                             //stop clock for incremental
     tml = (int)((float)t1*1000/CLOCKS_PER_SEC);      
     std::cout << "Incremental time: " << tml << std::endl;
@@ -26,7 +26,7 @@ double algorithm1(Vector points, bool max){
         return ret;
     }
     cout << "area incremental " << pol.area() << endl;
-    newpol = loops(pol, 1.5, 10, max, tml);
+    newpol = loops(pol, th, L, max, tml);
     t2 = clock() - t;                               //stop clock for local search
     tml = (int)((float)t2*1000/CLOCKS_PER_SEC);      
     std::cout << "Local search time: " << (int)((float)(t2-t1)*1000/CLOCKS_PER_SEC) << std::endl;
@@ -47,7 +47,7 @@ double algorithm1(Vector points, bool max){
 }
 
 //incremental + global step
-double algorithm2(Vector points, bool max){
+double algorithm2(Vector points, bool max, bool sm, bool x){
     std::cout << "starting algorithm2 for max:"<<max << std::endl;
     clock_t t,t1,t2;
     Polygon pol,newpol;
@@ -59,7 +59,7 @@ double algorithm2(Vector points, bool max){
     }
 
     t = clock();        //start clock for the whole algorithm      
-    pol = incremental(&points, edgeselect, 1, 1);
+    pol = incremental(&points, edgeselect, x, sm);
     t1 = clock() - t;                             //stop clock for incremental
     tml = (int)((float)t1*1000/CLOCKS_PER_SEC);      
     std::cout << "Incremental time: " << tml << std::endl;
@@ -91,7 +91,7 @@ double algorithm2(Vector points, bool max){
 }
 
 //incremental + global step + local step
-double algorithm3(Vector points, bool max){
+double algorithm3(Vector points, bool max, bool sm, bool x){
     std::cout << "starting algorithm3 for max:"<<max << std::endl;
     clock_t t,t1,t2;
     Polygon pol,newpol;
@@ -103,7 +103,7 @@ double algorithm3(Vector points, bool max){
     }
 
     t = clock();        //start clock for the whole algorithm      
-    pol = incremental(&points, edgeselect, 1, 1);
+    pol = incremental(&points, edgeselect, x, sm);
     t1 = clock() - t;                             //stop clock for incremental
     tml = (int)((float)t1*1000/CLOCKS_PER_SEC);      
     std::cout << "Incremental time: " << tml << std::endl;
@@ -146,7 +146,7 @@ double algorithm3(Vector points, bool max){
 }
 
 //incremental + subdivision + local step
-double algorithm4(Vector points, bool max){
+double algorithm4(Vector points, bool max, int sub){
     std::cout << "starting algorithm4 for max:"<<max << std::endl;
     clock_t t,t1,t2;
     Polygon pol,newpol;
@@ -158,37 +158,19 @@ double algorithm4(Vector points, bool max){
     }
 
     t = clock();        //start clock for the whole algorithm      
-    pol = incremental(&points, edgeselect, 1, 1);
-    t1 = clock() - t;                             //stop clock for incremental
-    tml = (int)((float)t1*1000/CLOCKS_PER_SEC);      
-    std::cout << "Incremental time: " << tml << std::endl;
+    tml = (int)((float)t*1000/CLOCKS_PER_SEC); 
+    pol = subdivision(points,sub,1,edgeselect,6000,max,tml);     ///with convex_hull
+    t1 = clock() - t;                               //stop clock for subdivision
+    tml = (int)((float)t2*1000/CLOCKS_PER_SEC);      
+    std::cout << "subdivision time: " << (int)((float)(t1)*1000/CLOCKS_PER_SEC) << std::endl;
 
     if(pol.area()==0){
         //failed
         cout << "failed" << endl;
         return ret;
     }
-    cout << "area incremental " << pol.area() << endl;
-    //------------------------------------
-    int sub;
-    if(pol.size() < 1000){      ///just for now - check it please
-        sub = pol.size()/2;     //preprocessing
-    }else{
-        sub = 100;
-    }
-    //----------------------------
-    newpol = subdivisionPol(pol,sub,0,edgeselect,6000,max,tml);     ///with convex_hull
-    t2 = clock() - t;                               //stop clock for subdivision
-    tml = (int)((float)t2*1000/CLOCKS_PER_SEC);      
-    std::cout << "subdivision time: " << (int)((float)(t2-t1)*1000/CLOCKS_PER_SEC) << std::endl;
-
-    if(newpol.area()==0){
-        //failed
-        cout << "failed" << endl;
-        return ret;
-    }
         
-    cout << "area subdivision " << newpol.area() << endl;
+    cout << "area subdivision " << pol.area() << endl;
     newpol = localglobalstep(pol,1,6000,max,0,Point(-1,-1),Point(-1,-1),tml);
     t2 = clock() - t;                               //stop clock for local step
     tml = (int)((float)t2*1000/CLOCKS_PER_SEC);      
