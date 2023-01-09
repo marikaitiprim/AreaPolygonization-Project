@@ -4,13 +4,9 @@
 #include <vector>
 #include <bits/stdc++.h>
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
-#include <ctime>
-#include "algorithms.h"
-#include "loops.h"
-#include "localglobalstep.h"
-#include "subdivision.h"
 #include <dirent.h>
-#define AL 2
+#include "evalalgorithms.h"
+#define AL 4
 
 using namespace std;
 
@@ -20,92 +16,6 @@ typedef vector<Point> Vector;
 typedef vector<int> Size;
 typedef vector<double> Score;
 typedef vector<Score> Storescore;
-
-double algorithm1(Vector points, bool max){
-    std::cout << "starting algorithm1 for max:"<<max << std::endl;
-    clock_t t,t1,t2;
-    Polygon pol,newpol;
-    int tml,edgeselect=2;
-    double ret=1.0;      //minimization failed
-    if(max){
-        ret=0.0;        //maximization failed
-        edgeselect = 3; //for incremental
-    }
-
-    t = clock();        //start clock for the whole algorithm      
-    pol = incremental(&points, edgeselect, 1, 1);
-    t1 = clock() - t;                             //stop clock for incremental
-    tml = (int)((float)t1*1000/CLOCKS_PER_SEC);      
-    std::cout << "Incremental time: " << tml << std::endl;
-
-    if(pol.area()==0){
-        //failed
-        cout << "failed" << endl;
-        return ret;
-    }
-    cout << "area incremental " << pol.area() << endl;
-    newpol = loops(pol, 1.5, 10, max, tml);
-    t2 = clock() - t;                               //stop clock for local search
-    tml = (int)((float)t2*1000/CLOCKS_PER_SEC);      
-    std::cout << "Local search time: " << (int)((float)(t2-t1)*1000/CLOCKS_PER_SEC) << std::endl;
-    std::cout << "Total: " << tml << std::endl;
-
-    if(newpol.area()==0){
-        //failed
-        cout << "failed" << endl;
-        return ret;
-    }else{
-        cout << "area local search " << newpol.area() << endl;
-    }
-
-    t = clock() - t;    //stop the clock of the whole algorithm
-    cout << "construction time: " << (int)((float)t*1000/CLOCKS_PER_SEC) << " milliseconds" << endl;
-    return newpol.area();
-
-}
-
-double algorithm2(Vector points, bool max){
-    std::cout << "starting algorithm2 for max:"<<max << std::endl;
-    clock_t t,t1,t2;
-    Polygon pol,newpol;
-    int tml,edgeselect=2;
-    double ret=1.0;      //minimization failed
-    if(max){
-        ret=0.0;        //maximization failed
-        edgeselect = 3;
-    }
-
-    t = clock();        //start clock for the whole algorithm      
-    pol = incremental(&points, edgeselect, 1, 1);
-    t1 = clock() - t;                             //stop clock for incremental
-    tml = (int)((float)t1*1000/CLOCKS_PER_SEC);      
-    std::cout << "Incremental time: " << tml << std::endl;
-
-    if(pol.area()==0){
-        //failed
-        cout << "failed" << endl;
-        return ret;
-    }
-    cout << "area incremental " << pol.area() << endl;
-    newpol = localglobalstep(pol,2,6000,max,0,Point(-1,-1),Point(-1,-1),tml);
-    t2 = clock() - t;                               //stop clock for local step
-    tml = (int)((float)t2*1000/CLOCKS_PER_SEC);      
-    std::cout << "global step time: " << (int)((float)(t2-t1)*1000/CLOCKS_PER_SEC) << std::endl;
-    std::cout << "Total: " << tml << std::endl;
-
-    if(newpol.area()==0){
-        //failed
-        cout << "failed" << endl;
-        return ret;
-    }else{
-        cout << "area global step " << newpol.area() << endl;
-    }
-
-    t = clock() - t;    //stop the clock of the whole algorithm
-    cout << "construction time: " << (int)((float)t*1000/CLOCKS_PER_SEC) << " milliseconds" << endl;
-    return newpol.area();
-
-}
 
 int main(int argc, char *argv[]){
 
@@ -213,7 +123,7 @@ int main(int argc, char *argv[]){
                 if(position == -1){    //first time evaluating this size of points
                     pointsize.push_back(points.size());
                     position = pointsize.size()-1;
-                    //set scores to 0
+                    //set scores to 0 and set bounds
                     Score tempsc;
                     tempsc.push_back(0.0);
                     tempsc.push_back(0.0);
@@ -226,7 +136,7 @@ int main(int argc, char *argv[]){
                 Polygon cpol;
                 CGAL::convex_hull_2(points.begin(),points.end(),std::back_inserter(cpol));
 
-                //algorithm1--> incremental + local search 
+                //algorithm1
                 if(num_of_algorithms==1){
                     double res1=algorithm1(points,1);        //max
                     if((res1!=1.0)&&(res1!=0.0)){       
@@ -266,10 +176,43 @@ int main(int argc, char *argv[]){
                 }
                 else if(num_of_algorithms==3){
                     //algorithm 3
+                    double res3=algorithm3(points,1);       //max
+                    if((res3!=1.0)&&(res3!=0.0)){
+                        score_max = abs(res3)/abs(cpol.area());
+                        std::cout << "\tResult of algorithm3 max is: " << score_max << std::endl;
+                    }
+                    else{
+                        score_max = res3;
+                    }
+
+                    res3=algorithm3(points,0);       //min
+                    if((res3!=1.0)&&(res3!=0.0)){
+                        score_min = abs(res3)/abs(cpol.area());
+                        std::cout << "\tResult of algorithm3 min is: " << score_min << std::endl;
+                    }
+                    else{
+                        score_min = res3;
+                    }
                 }
                 else if(num_of_algorithms==4){
                     //algorithm 4
-                    //...
+                    double res4=algorithm4(points,1);       //max
+                    if((res4!=1.0)&&(res4!=0.0)){
+                        score_max = abs(res4)/abs(cpol.area());
+                        std::cout << "\tResult of algorithm4 max is: " << score_max << std::endl;
+                    }
+                    else{
+                        score_max = res4;
+                    }
+
+                    res4=algorithm4(points,0);       //min
+                    if((res4!=1.0)&&(res4!=0.0)){
+                        score_min = abs(res4)/abs(cpol.area());
+                        std::cout << "\tResult of algorithm4 min is: " << score_min << std::endl;
+                    }
+                    else{
+                        score_min = res4;
+                    }
                 }
 
                 //save scores to the appropriate position
@@ -281,7 +224,7 @@ int main(int argc, char *argv[]){
                 }
                 tempscore[1] += score_max;
                 bound_max = tempscore[3];
-                if(score_max<bound_max){        //bouns for max
+                if(score_max<bound_max){        //bound for max
                     tempscore[3] = score_max;
                 }
                 stscores.erase(stscores.begin()+position);
@@ -297,18 +240,22 @@ int main(int argc, char *argv[]){
             cout << "Size   || minscore | max score | min bound | max bound ||" << endl;
             outfile << "Size   || minscore | max score | min bound | max bound ||" << endl;
 
-            for(int k=0; k<pointsize.size(); k++){      //for every point size
-                cout << pointsize[k] << "   || ";
-                outfile << pointsize[k] << "   || ";
+            while(!pointsize.empty()){     
+                int minelement = distance(begin(pointsize), min_element(begin(pointsize), end(pointsize)));
 
-                Score tsc = stscores[k];
+                cout << pointsize[minelement] << "   || ";
+                outfile << pointsize[minelement] << "   || ";
+
+                Score tsc = stscores[minelement];
                   
                 cout << tsc[0] << " | " << tsc[1] << " | " << tsc[2] << " | " << tsc[3] << " || "; 
                 outfile << tsc[0] << " | " << tsc[1] << " | " << tsc[2] << " | " << tsc[3] << " || "; 
 
-
                 cout << endl;
                 outfile << endl;
+
+                pointsize.erase(pointsize.begin()+minelement);
+                stscores.erase(stscores.begin()+minelement);
             }
         } 
         else {
