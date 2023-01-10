@@ -40,3 +40,8 @@ data and size from the vectors.
 We checked the code from the previous two projects and made them as fast as we could. We achieved that by not checking if the middle of an edge intersects
 with a point (since we check the two points of the edge, this was reduntand), instead of checking for every edge and every point, after some 800 points, we only
 check random points and edges in local search
+
+
+
+While working on preprocessing we tried to make the algorithms run without failling due to being cut off by time. Thus are preprocessing values were set having in
+mind that this programm might run for many points.
