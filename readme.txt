@@ -37,3 +37,6 @@ we decided to omit and not include into the program.
 Finally, we both print and write in a file a table with the scores and bounds of each algorithm that are used mainly to compare in the report.txt. For printing,
 we use the vectors we discussed previously, by finding the index of the smaller size each time, printing its data and then remove both 
 data and size from the vectors.
+We checked the code from the previous two projects and made them as fast as we could. We achieved that by not checking if the middle of an edge intersects
+with a point (since we check the two points of the edge, this was reduntand), instead of checking for every edge and every point, after some 800 points, we only
+check random points and edges in local search
