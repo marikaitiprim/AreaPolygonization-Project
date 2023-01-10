@@ -17,7 +17,6 @@ SegmentVector protectedpoints(Vector sorted){
     }
     Segment left=Segment( sorted[0], afterfirst);
     Segment right=Segment( beforelast, sorted[sorted.size()-1]);
-    std::cout<<"left= "<<left<<" right= "<<right<<std::endl;
     SegmentVector temp;
     temp.push_back(left);
     temp.push_back(right);

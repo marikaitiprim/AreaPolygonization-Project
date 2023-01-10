@@ -5,7 +5,6 @@
 *and if not we go back one point or front depending where the higher point is.
 */
 Subsets splitsubsets(Vector points, int m){
-    std::cout<<"in split subsets with m="<<m<<" pointsize="<<points.size()<<std::endl;
     int n=points.size();
     Vector sortpoints = sortv(&points,1,1);              //sort points by increasing x
 
@@ -92,9 +91,7 @@ Polygon locglobsub(Subsets subs, Polygons pols, int L, bool maxmin){
 /*subdivision case for simulated annealing. bool incremental = 1 if greedy algorithm incremental
 has been selected, 0 if convex hull*/
 Polygon subdivision(Vector points,int m, bool inc, int edgeselect,int L, bool maxmin, int time){
-    std::cout<<"in subdivision"<<std::endl;
     Subsets subs = splitsubsets(points,m);
-    std::cout<<"after split"<<std::endl;
     Polygons pols;
     SegmentVector protect;
     clock_t t;
