@@ -101,7 +101,6 @@ Polygon subdivision(Vector points,int m, bool inc, int edgeselect,int L, bool ma
     int cutoff = 500*points.size();
     int tms = (int)((float)clock()*1000/CLOCKS_PER_SEC) + time;        //starting  milliseconds
     int tml;
-    std::cout<<"start incremental"<<std::endl;
     if(inc){                //incremental algorithm
         for(int i=0; i<subs.size(); i++){       //for every subset
             Polygon pol;

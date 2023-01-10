@@ -1,4 +1,3 @@
-//./evaluate -i ../instances/data/uniform/ -o output.txt
 #include <iostream>
 #include <string>
 #include <vector>
@@ -6,7 +5,7 @@
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <dirent.h>
 #include "evalalgorithms.h"
-#define AL 4
+#define AL 7    //number of algorithms to be tested
 
 using namespace std;
 
@@ -24,7 +23,7 @@ int main(int argc, char *argv[]){
     int tml;
 
     //errors in arguments
-    if(argc != 5 && argc != 7){               //less args
+    if(argc != 5){               //less args
         cout << "Please give the right the arguments" << endl;
         exit(1);
     }
@@ -33,15 +32,12 @@ int main(int argc, char *argv[]){
     const char* inputfolder = argv[2];
     const char* outputfile = argv[4];
     char* inputfile;
-    if(argc==7){        //preprocess argument
-        //preprocessing
-    }
 
     DIR *dir;
     struct dirent *folder;
     Size pointsize;                                     //vector to store the point size of each file
     Storescore stscores;                                //vector to store the vectors with the scores for each size
-    int num_of_algorithms = 3;
+    int num_of_algorithms = 0;
     double score_max, score_min, bound_max, bound_min;
 
     ofstream outfile;
@@ -140,9 +136,8 @@ int main(int argc, char *argv[]){
                 int L=10;
                 double th=5.0;
 
-                //------------------------------------
                 int sub=100;
-                if(points.size() < 500){      ///just for now - check it please
+                if(points.size() < 500){      
                     sub = points.size()/2;     //preprocessing
                 }else if(points.size()<2000){
                     sub = 100;
@@ -150,7 +145,6 @@ int main(int argc, char *argv[]){
                 else{
                     sub = 200;
                 }
-                //----------------------------
 
                 if(points.size()<=800){
                     L=10;
@@ -189,7 +183,7 @@ int main(int argc, char *argv[]){
                 }
                 else if(num_of_algorithms==2){
                     //algorithm 2
-                    double res2=algorithm2(points,1,1,x);       //max
+                    double res2=algorithm2(points,1,1,x,th,L);       //max
                     if((res2!=1.0)&&(res2!=0.0)){
                         score_max = abs(res2)/abs(cpol.area());
                         std::cout << "\tResult of algorithm2 max is: " << score_max << std::endl;
@@ -198,7 +192,7 @@ int main(int argc, char *argv[]){
                         score_max = res2;
                     }
 
-                    res2=algorithm2(points,0,1,x);       //min
+                    res2=algorithm2(points,0,1,x,th,L);       //min
                     if((res2!=1.0)&&(res2!=0.0)){
                         score_min = abs(res2)/abs(cpol.area());
                         std::cout << "\tResult of algorithm2 min is: " << score_min << std::endl;
@@ -245,6 +239,63 @@ int main(int argc, char *argv[]){
                     }
                     else{
                         score_min = res4;
+                    }
+                }else if(num_of_algorithms==5){
+                    //algorithm 5
+                    double res5=algorithm5(points,1,sub);       //max
+                    if((res5!=1.0)&&(res5!=0.0)){
+                        score_max = abs(res5)/abs(cpol.area());
+                        std::cout << "\tResult of algorithm5 max is: " << score_max << std::endl;
+                    }
+                    else{
+                        score_max = res5;
+                    }
+
+                    res5=algorithm5(points,0,sub);       //min
+                    if((res5!=1.0)&&(res5!=0.0)){
+                        score_min = abs(res5)/abs(cpol.area());
+                        std::cout << "\tResult of algorithm5 min is: " << score_min << std::endl;
+                    }
+                    else{
+                        score_min = res5;
+                    }
+                }else if(num_of_algorithms==6){
+                    //algorithm 6
+                    double res6=algorithm6(points,1,sub);       //max
+                    if((res6!=1.0)&&(res6!=0.0)){
+                        score_max = abs(res6)/abs(cpol.area());
+                        std::cout << "\tResult of algorithm6 max is: " << score_max << std::endl;
+                    }
+                    else{
+                        score_max = res6;
+                    }
+
+                    res6=algorithm6(points,0,sub);       //min
+                    if((res6!=1.0)&&(res6!=0.0)){
+                        score_min = abs(res6)/abs(cpol.area());
+                        std::cout << "\tResult of algorithm6 min is: " << score_min << std::endl;
+                    }
+                    else{
+                        score_min = res6;
+                    }
+                }else if(num_of_algorithms==7){
+                    //algorithm 7
+                    double res7=algorithm7(points,1,sub);       //max
+                    if((res7!=1.0)&&(res7!=0.0)){
+                        score_max = abs(res7)/abs(cpol.area());
+                        std::cout << "\tResult of algorithm7 max is: " << score_max << std::endl;
+                    }
+                    else{
+                        score_max = res7;
+                    }
+
+                    res7=algorithm7(points,0,sub);       //min
+                    if((res7!=1.0)&&(res7!=0.0)){
+                        score_min = abs(res7)/abs(cpol.area());
+                        std::cout << "\tResult of algorithm7 min is: " << score_min << std::endl;
+                    }
+                    else{
+                        score_min = res7;
                     }
                 }
 
