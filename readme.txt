@@ -38,10 +38,8 @@ Finally, we both print and write in a file a table with the scores and bounds of
 we use the vectors we discussed previously, by finding the index of the smaller size each time, printing its data and then remove both 
 data and size from the vectors.
 We checked the code from the previous two projects and made them as fast as we could. We achieved that by not checking if the middle of an edge intersects
-with a point (since we check the two points of the edge, this was reduntand), instead of checking for every edge and every point, after some 800 points, we only
-check random points and edges in local search
-
-
-
-While working on preprocessing we tried to make the algorithms run without failling due to being cut off by time. Thus are preprocessing values were set having in
+with a point (since we check the two points of the edge, this was redundant), instead of checking for every edge and every point, after some 800 points, we only
+check random points and edges in local search. We also fixed the local step to initialize only one time the kd tree and added some breaks in loops for simmulated 
+annealing generally.
+While working on preprocessing we tried to make the algorithms run without failing due to being cut off by time. Thus preprocessing values were set having in
 mind that this programm might run for many points.
