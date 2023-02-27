@@ -1,3 +1,0 @@
-/home/angelos/Project2-Optimization/Project2-Optimization/example/subdivision/CMakeFiles/rebuild_cache.dir
-/home/angelos/Project2-Optimization/Project2-Optimization/example/subdivision/CMakeFiles/edit_cache.dir
-/home/angelos/Project2-Optimization/Project2-Optimization/example/subdivision/CMakeFiles/ex.dir
